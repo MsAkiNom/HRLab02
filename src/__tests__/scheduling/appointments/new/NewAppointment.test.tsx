@@ -1,6 +1,9 @@
 import { Toaster } from '@hospitalrun/components'
-import { render, screen } from '@testing-library/react'
+import addMinutes from 'date-fns/addMinutes'
 import { createMemoryHistory } from 'history'
+import userEvent from '@testing-library/user-event'
+import { render, screen, fireEvent, within } from '@testing-library/react'
+import roundToNearestMinutes from 'date-fns/roundToNearestMinutes'
 import React from 'react'
 import { ReactQueryConfigProvider } from 'react-query'
 import { Provider } from 'react-redux'
@@ -78,6 +81,40 @@ describe('New Appointment', () => {
             setup()
 
             expect(await screen.findByLabelText('new appointment form')).toBeInTheDocument()
+        })
+    })
+
+    describe('new appointment creation', () => {
+        it('should have error if patient record does not exist', async () => {
+            setup()
+
+            const expectedError = {
+                message: 'scheduling.appointment.errors.createAppointmentError',
+                patient: 'scheduling.appointment.errors.patientRequired',
+            }
+
+            const expectedAppointment = {
+                patient: '',
+                startDateTime: roundToNearestMinutes(new Date(), { nearestTo: 15 }).toISOString(),
+                endDateTime: addMinutes(
+                    roundToNearestMinutes(new Date(), { nearestTo: 15 }),
+                    60,
+                ).toISOString(),
+                location: 'location',
+                reason: 'reason',
+                type: 'routine',
+            } as Appointment
+
+            userEvent.type(
+                screen.getByPlaceholderText(/scheduling\.appointment\.patient/i),
+                expectedAppointment.patient,
+            )
+
+            userEvent.click(screen.getByText(/scheduling.appointments.createAppointment/i))
+
+            expect(screen.getByText(expectedError.message)).toBeInTheDocument()
+            expect(screen.getByPlaceholderText(/scheduling\.appointment\.patient/i)).toHaveClass('is-invalid')
+            expect(AppointmentRepository.save).not.toHaveBeenCalled()
         })
     })
 
