@@ -1,3 +1,5 @@
+import isBefore from 'date-fns/isBefore'
+
 import Appointment from '../../../shared/model/Appointment'
 
 export class AppointmentError extends Error {
@@ -18,6 +20,9 @@ export default function validateAppointment(appointment: Appointment): Appointme
 
   if (!appointment.patient) {
     newError.patient = 'scheduling.appointment.errors.patientRequired'
+  }
+  if (isBefore(new Date(appointment.endDateTime), new Date(appointment.startDateTime))) {
+    newError.startDateTime = 'scheduling.appointment.errors.startDateMustBeBeforeEndDate'
   }
 
   return newError as AppointmentError
