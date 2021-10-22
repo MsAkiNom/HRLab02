@@ -116,6 +116,46 @@ describe('New Appointment', () => {
             expect(screen.getByPlaceholderText(/scheduling\.appointment\.patient/i)).toHaveClass('is-invalid')
             expect(AppointmentRepository.save).not.toHaveBeenCalled()
         })
+
+        it('should have error when end time earlier than start time', async () => {
+            setup()
+      
+            const expectedError = {
+              message: 'scheduling.appointment.errors.createAppointmentError',
+              startDateTime: 'scheduling.appointment.errors.startDateMustBeBeforeEndDate',
+            }
+      
+            const expectedAppointment = {
+              patient: expectedPatient.fullName,
+              startDateTime: new Date(2020, 10, 10, 0, 0, 0, 0).toISOString(),
+              endDateTime: new Date(1957, 10, 10, 0, 0, 0, 0).toISOString(),
+              location: 'location',
+              reason: 'reason',
+              type: 'routine',
+            } as Appointment
+      
+            userEvent.type(
+              screen.getByPlaceholderText(/scheduling\.appointment\.patient/i),
+              expectedAppointment.patient,
+            )
+            fireEvent.change(within(screen.getByTestId('startDateDateTimePicker')).getByRole('textbox'), {
+              target: { value: expectedAppointment.startDateTime },
+            })
+            fireEvent.change(within(screen.getByTestId('endDateDateTimePicker')).getByRole('textbox'), {
+              target: { value: expectedAppointment.endDateTime },
+            })
+            userEvent.click(screen.getByText(/scheduling.appointments.createAppointment/i))
+      
+            expect(screen.getByText(expectedError.message)).toBeInTheDocument()
+            expect(screen.getByPlaceholderText(/scheduling\.appointment\.patient/i)).toHaveClass(
+              'is-invalid',
+            )
+            expect(
+              within(screen.getByTestId('startDateDateTimePicker')).getByRole('textbox'),
+            ).toHaveClass('is-invalid')
+            expect(screen.getByText(expectedError.startDateTime)).toBeInTheDocument()
+            expect(AppointmentRepository.save).toHaveBeenCalledTimes(0)
+        })
     })
 
 })
