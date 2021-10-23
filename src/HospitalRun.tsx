@@ -13,6 +13,7 @@ import { ButtonBarProvider } from './page-header/button-toolbar/ButtonBarProvide
 import ButtonToolBar from './page-header/button-toolbar/ButtonToolBar'
 import { useTitle } from './page-header/title/TitleContext'
 import Patients from './patients/Patients'
+import Appointments from './scheduling/appointments/Appointments'
 import Settings from './settings/Settings'
 import Navbar from './shared/components/navbar/Navbar'
 import { NetworkStatusMessage } from './shared/components/network-status'
@@ -47,6 +48,7 @@ const HospitalRun = () => {
               <div>
                 <Switch>
                   <Route exact path="/" component={Dashboard} />
+                  <Route path="/appointments" component={Appointments} />
                   <Route path="/patients" component={Patients} />
                   <Route path="/labs" component={Labs} />
                   <Route path="/medications" component={Medications} />
