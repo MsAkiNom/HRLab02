@@ -1,4 +1,4 @@
-import { render, waitFor } from '@testing-library/react'
+import { render, waitFor, screen } from '@testing-library/react'
 import addMinutes from 'date-fns/addMinutes'
 import roundToNearestMinutes from 'date-fns/roundToNearestMinutes'
 import { createMemoryHistory } from 'history'
@@ -87,6 +87,16 @@ describe('Edit Appointment', () => {
     })
     await waitFor(() => {
       expect(PatientRepository.find).toHaveBeenCalledWith(expectedAppointment.patient)
+    })
+  })
+
+  it('should render an edit appointment form', async () => {
+    setup(expectedAppointment, expectedPatient)
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /scheduling.appointments.updateAppointment/i }),
+      ).toBeInTheDocument()
     })
   })
 })
