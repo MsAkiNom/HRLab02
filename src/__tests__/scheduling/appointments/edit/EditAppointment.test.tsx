@@ -1,4 +1,5 @@
 import { render, waitFor, screen } from '@testing-library/react'
+import userEvent from '@testing-library/user-event'
 import addMinutes from 'date-fns/addMinutes'
 import roundToNearestMinutes from 'date-fns/roundToNearestMinutes'
 import { createMemoryHistory } from 'history'
@@ -97,6 +98,24 @@ describe('Edit Appointment', () => {
       expect(
         screen.getByRole('button', { name: /scheduling.appointments.updateAppointment/i }),
       ).toBeInTheDocument()
+    })
+  })
+
+  it('should editAppointment when save button is clicked', async () => {
+    setup(expectedAppointment, expectedPatient)
+
+    await waitFor(() => {
+      expect(
+        screen.getByRole('button', { name: /scheduling.appointments.updateAppointment/i }),
+      ).toBeInTheDocument()
+    })
+
+    userEvent.click(
+      await screen.findByRole('button', { name: /scheduling.appointments.updateAppointment/i }),
+    )
+
+    await waitFor(() => {
+      expect(AppointmentRepository.saveOrUpdate).toHaveBeenCalledWith(expectedAppointment)
     })
   })
 })
