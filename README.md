@@ -11,4 +11,4 @@ Hospital Run is a free software for developing world hospitals. If you're intere
 
 ## License
 
-Released under the [MIT license](LICENSE).
+Released under the [MIT license](LICENSE)
